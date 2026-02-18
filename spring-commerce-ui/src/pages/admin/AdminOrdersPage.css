@@ -1,0 +1,92 @@
+.admin-page {
+    width: 100%;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.page-header h1 {
+    font-size: 1.8rem;
+    color: #111827;
+}
+
+.table-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-table th {
+    background-color: #f9fafb;
+    font-weight: 600;
+    color: #4b5563;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.admin-table tr:hover {
+    background-color: #f9fafb;
+}
+
+.sub-text {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-badge.PENDING {
+    background-color: #fefcbf;
+    color: #b7791f;
+}
+
+.status-badge.CONFIRMED {
+    background-color: #c6f6d5;
+    color: #2f855a;
+}
+
+.status-badge.SHIPPED {
+    background-color: #bee3f8;
+    color: #2b6cb0;
+}
+
+.status-badge.DELIVERED {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-badge.CANCELLED {
+    background-color: #fed7d7;
+    color: #c53030;
+}
+
+.status-select {
+    padding: 6px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    background-color: white;
+}
