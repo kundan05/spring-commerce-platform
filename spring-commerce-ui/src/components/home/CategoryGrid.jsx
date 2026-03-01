@@ -5,27 +5,27 @@ import './CategoryGrid.css';
 const categories = [
     {
         id: 1,
-        name: 'Living Room',
-        image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=2070&auto=format&fit=crop',
-        slug: 'living-room'
+        name: 'Cricket Bats',
+        image: '/images/products/bat.jpg',
+        slug: 'bats'
     },
     {
         id: 2,
-        name: 'Dining',
-        image: 'https://images.unsplash.com/photo-1617806118233-18e1de247200?q=80&w=1932&auto=format&fit=crop',
-        slug: 'dining'
+        name: 'Cricket Balls',
+        image: '/images/products/ball.jpg',
+        slug: 'balls'
     },
     {
         id: 3,
-        name: 'Bedroom',
-        image: 'https://images.unsplash.com/photo-1616594039964-40891a909a1f?q=80&w=2070&auto=format&fit=crop',
-        slug: 'bedroom'
+        name: 'Protection',
+        image: '/images/products/equipment.jpg',
+        slug: 'protection'
     },
     {
         id: 4,
-        name: 'Office',
-        image: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=2070&auto=format&fit=crop',
-        slug: 'office'
+        name: 'Accessories',
+        image: '/images/products/equipment.jpg',
+        slug: 'accessories'
     }
 ];
 

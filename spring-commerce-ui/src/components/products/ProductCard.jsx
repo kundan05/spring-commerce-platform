@@ -27,11 +27,6 @@ const ProductCard = ({ product }) => {
                             Low Stock
                         </span>
                     )}
-                    {product.id % 2 === 0 && (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary-100 text-secondary-800">
-                            New
-                        </span>
-                    )}
                 </div>
 
                 {/* Hover Actions Overlay */}

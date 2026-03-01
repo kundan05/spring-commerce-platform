@@ -27,6 +27,14 @@ public class ProductService {
                 .map(this::mapToResponse);
     }
 
+    public Page<ProductResponse> getAllProducts(String search, Long categoryId, java.math.BigDecimal minPrice,
+            java.math.BigDecimal maxPrice, Pageable pageable) {
+        org.springframework.data.jpa.domain.Specification<Product> spec = com.ecommerce.repository.spec.ProductSpecification
+                .filterBy(search, categoryId, minPrice, maxPrice);
+        return productRepository.findAll(spec, pageable)
+                .map(this::mapToResponse);
+    }
+
     public ProductResponse getProductById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
@@ -45,8 +53,8 @@ public class ProductService {
     }
 
     public Page<ProductResponse> searchProducts(String query, Pageable pageable) {
-        return productRepository.findByNameContainingIgnoreCase(query, pageable)
-                .map(this::mapToResponse);
+        // Delegating to the new method for backward compatibility or direct usage
+        return getAllProducts(query, null, null, null, pageable);
     }
 
     @org.springframework.transaction.annotation.Transactional

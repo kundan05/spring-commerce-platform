@@ -79,7 +79,7 @@ const ProductDetailPage = () => {
                 <div className="flex flex-col">
                     <div className="mb-2">
                         <span className="text-sm font-medium text-primary-600 bg-primary-50 px-3 py-1 rounded-full inline-block">
-                            {product.categoryName || 'Furniture'}
+                            {product.categoryName || 'Uncategorized'}
                         </span>
                     </div>
 
@@ -91,11 +91,8 @@ const ProductDetailPage = () => {
                         <span className="text-3xl font-bold text-gray-900">
                             ${product.price.toFixed(2)}
                         </span>
-                        <div className="flex items-center text-yellow-400 text-sm">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                                <FaStar key={star} />
-                            ))}
-                            <span className="text-gray-500 ml-2 text-sm">(4.8/5)</span>
+                        <div className="flex items-center text-sm text-gray-400">
+                            <span>No reviews yet</span>
                         </div>
                     </div>
 

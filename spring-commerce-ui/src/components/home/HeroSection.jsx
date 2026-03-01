@@ -18,20 +18,20 @@ const HeroSection = () => {
         <section className="hero-section">
             <div className="container hero-container">
                 <div className="hero-content">
-                    <span className="hero-eyebrow">Spring Collection 2026</span>
+                    <span className="hero-eyebrow">Est. 2024 · Bangalore</span>
                     <h1 className="hero-title">
-                        Minimalist Living for Modern Homes
+                        Your Next Innings Starts Here
                     </h1>
                     <p className="hero-subtitle">
-                        Discover our curated collection of Scandinavian furniture and decor.
-                        Designed for comfort, crafted for life.
+                        We pick what we'd actually play with — bats with proper grains,
+                        balls that swing, pads that don't weigh you down.
                     </p>
                     <div className="hero-actions">
                         <Link to="/products">
-                            <Button size="lg" variant="primary">Shop Collection</Button>
+                            <Button size="lg" variant="primary">Browse the Kit</Button>
                         </Link>
                         <Link to="/about">
-                            <Button size="lg" variant="outline">Learn More</Button>
+                            <Button size="lg" variant="outline">Our Story</Button>
                         </Link>
                     </div>
                 </div>
@@ -42,8 +42,8 @@ const HeroSection = () => {
                         style={{ transform: `translateY(${offset * 0.1}px)` }} // Subtle Parallax
                     >
                         <img
-                            src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=2158&auto=format&fit=crop"
-                            alt="Modern Living Room"
+                            src="/images/hero/cricket-stadium.jpg"
+                            alt="Cricket Stadium"
                         />
                     </div>
                     {/* Decorative Circle */}

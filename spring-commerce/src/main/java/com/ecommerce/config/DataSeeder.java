@@ -58,7 +58,8 @@ public class DataSeeder implements CommandLineRunner {
 
         Product bat = new Product();
         bat.setName("Pro Grade English Willow Bat");
-        bat.setDescription("Hand-crafted Grade 1 English Willow for superior stroke play and balance.");
+        bat.setDescription(
+                "Grade 1 English Willow — good grains, balanced pickup, ready to play after a light knock-in.");
         bat.setPrice(new BigDecimal("350.00"));
         bat.setStockQuantity(15);
         bat.setCategory(equipment);
@@ -66,7 +67,7 @@ public class DataSeeder implements CommandLineRunner {
 
         Product ball = new Product();
         ball.setName("Match Quality Leather Ball");
-        ball.setDescription("Official regulation 4-piece leather ball, alum tanned for durability.");
+        ball.setDescription("4-piece alum-tanned leather, holds its seam well. Good for both practice and match days.");
         ball.setPrice(new BigDecimal("35.00"));
         ball.setStockQuantity(100);
         ball.setCategory(equipment);
@@ -74,7 +75,8 @@ public class DataSeeder implements CommandLineRunner {
 
         Product pads = new Product();
         pads.setName("Elite Batting Pads");
-        pads.setDescription("Lightweight high-density foam pads for maximum protection and comfort.");
+        pads.setDescription(
+                "High-density foam with a comfortable fit. Light enough that they don't slow you down between wickets.");
         pads.setPrice(new BigDecimal("75.00"));
         pads.setStockQuantity(25);
         pads.setCategory(accessories);
@@ -82,13 +84,12 @@ public class DataSeeder implements CommandLineRunner {
 
         Product kit = new Product();
         kit.setName("Junior Cricket Kit");
-        kit.setDescription("Complete starter kit including bat, ball, stumps, and carry bag.");
+        kit.setDescription(
+                "Everything a beginner needs — bat, ball, stumps, and a bag to carry it all. Makes a great gift.");
         kit.setPrice(new BigDecimal("120.00"));
         kit.setStockQuantity(10);
         kit.setCategory(equipment);
         kit.setImageUrl("/images/products/equipment.jpg");
-
-        productRepository.saveAll(Arrays.asList(bat, ball, pads, kit));
 
         productRepository.saveAll(Arrays.asList(bat, ball, pads, kit));
 

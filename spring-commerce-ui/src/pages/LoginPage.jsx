@@ -39,9 +39,9 @@ const LoginPage = () => {
                     <div className="mx-auto h-12 w-12 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 mb-4">
                         <FaLock size={20} />
                     </div>
-                    <h2 className="text-3xl font-extrabold font-display text-gray-900">Welcome Back</h2>
+                    <h2 className="text-3xl font-extrabold font-display text-gray-900">Sign In</h2>
                     <p className="mt-2 text-sm text-gray-600">
-                        Sign in to access your account
+                        Good to see you again.
                     </p>
                 </div>
 
