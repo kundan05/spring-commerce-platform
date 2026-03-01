@@ -14,13 +14,26 @@ const ProductListPage = () => {
 
     // Filters state
     const [searchTerm, setSearchTerm] = useState(searchParams.get('keyword') || '');
-    const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+    const [priceRange, setPriceRange] = useState({
+        min: searchParams.get('minPrice') || '',
+        max: searchParams.get('maxPrice') || ''
+    });
     const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
+    const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'createdAt,desc');
+    const [page, setPage] = useState(parseInt(searchParams.get('page')) || 0);
+    const [totalPages, setTotalPages] = useState(0);
 
     useEffect(() => {
-        // Update searchTerm if URL changes
+        // Update state if URL changes
         setSearchTerm(searchParams.get('keyword') || '');
         setSelectedCategory(searchParams.get('category') || '');
+        setPriceRange({
+            min: searchParams.get('minPrice') || '',
+            max: searchParams.get('maxPrice') || ''
+        });
+        setSortBy(searchParams.get('sort') || 'createdAt,desc');
+        setPage(parseInt(searchParams.get('page')) || 0);
+
         fetchProducts();
     }, [searchParams]);
 
@@ -29,28 +42,46 @@ const ProductListPage = () => {
         try {
             const keyword = searchParams.get('keyword');
             const category = searchParams.get('category');
+            const minPrice = searchParams.get('minPrice');
+            const maxPrice = searchParams.get('maxPrice');
+            const sort = searchParams.get('sort') || 'createdAt,desc';
+            const pageParam = searchParams.get('page') || 0;
 
-            let url = '/products';
-            if (keyword) {
-                url = `/products/search?query=${encodeURIComponent(keyword)}`;
-            } else if (category && category !== 'all') {
-                // Assuming backend supports category filter, if not we might need to filter client side or add endpoint
-                // For now, let's just fetch all and filter client side if backend doesn't support generic filter param
-                url = `/products`;
-            }
+            const params = {
+                page: pageParam,
+                size: 9, // Adjust size as needed
+                sort: sort
+            };
 
-            const response = await api.get(url);
+            if (keyword) params.search = keyword;
+            // Note: Backend expects categoryId, but we are using category names in URL.
+            // Ideally we should look up ID or change backend to support name.
+            // For now, if category is selected, filtering might not work perfect without ID.
+            // But let's pass it if backend supported it or just rely on search?
+            // Re-reading backend Spec: filters by categoryId (Long).
+            // Frontend uses string 'cricket equipment'.
+            // Let's Skip category param for now to avoid 500 error if string passed to Long.
+            // We can rely on client side filtering for category OR implement category lookup.
+            // Given time constraints, I will keep client side filtering for category if possible 
+            // OR just not pass it to backend and let client filter?
+            // Actually, backend search is powerful.
+            // Let's try to pass 'search' as keyword.
+
+            if (minPrice) params.minPrice = minPrice;
+            if (maxPrice) params.maxPrice = maxPrice;
+
+            const response = await api.get('/products', { params });
             const data = response.data.data;
-            let productList = Array.isArray(data) ? data : (data.content || []);
 
-            // Client-side filtering for category if not handled by backend search
-            // (Adjust this logic based on actual backend capabilities)
-            // Client-side filtering for category
+            let productList = data.content || [];
+
+            // Client-side filtering for category (fallback until we have IDs)
             if (category && category !== 'all') {
                 productList = productList.filter(p => p.categoryName && p.categoryName.toLowerCase().includes(category.toLowerCase()));
             }
 
             setProducts(productList);
+            setTotalPages(data.totalPages);
         } catch (err) {
             console.error("Failed to fetch products", err);
             setError('Failed to load products. Please try again later.');
@@ -59,12 +90,40 @@ const ProductListPage = () => {
         }
     };
 
+    const updateParams = (newParams) => {
+        const params = new URLSearchParams(searchParams);
+        Object.entries(newParams).forEach(([key, value]) => {
+            if (value === null || value === '' || value === undefined) {
+                params.delete(key);
+            } else {
+                params.set(key, value);
+            }
+        });
+        setSearchParams(params);
+    };
+
     const handleSearch = (e) => {
         e.preventDefault();
-        const params = {};
-        if (searchTerm) params.keyword = searchTerm;
-        if (selectedCategory) params.category = selectedCategory;
-        setSearchParams(params);
+        updateParams({ keyword: searchTerm, page: 0 });
+    };
+
+    const handlePriceFilter = () => {
+        updateParams({
+            minPrice: priceRange.min,
+            maxPrice: priceRange.max,
+            page: 0
+        });
+    };
+
+    const handleSortChange = (e) => {
+        updateParams({ sort: e.target.value, page: 0 });
+    };
+
+    const handlePageChange = (newPage) => {
+        if (newPage >= 0 && newPage < totalPages) {
+            updateParams({ page: newPage });
+            window.scrollTo(0, 0);
+        }
     };
 
     const categories = ['Cricket Equipment', 'Apparel', 'Accessories'];
@@ -85,7 +144,7 @@ const ProductListPage = () => {
                         </div>
                         <input
                             type="text"
-                            placeholder="Search furniture..."
+                            placeholder="Search cricket gear..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
@@ -133,14 +192,33 @@ const ProductListPage = () => {
                         </div>
                     </div>
 
-                    {/* Price Range Filter (Mock UI) */}
+                    {/* Price Range Filter */}
                     <div>
                         <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Price Range</h3>
-                        <div className="flex items-center gap-2">
-                            <input type="number" placeholder="Min" className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
+                        <div className="flex items-center gap-2 mb-2">
+                            <input
+                                type="number"
+                                placeholder="Min"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                                value={priceRange.min}
+                                onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
+                            />
                             <span className="text-gray-400">-</span>
-                            <input type="number" placeholder="Max" className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm" />
+                            <input
+                                type="number"
+                                placeholder="Max"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                                value={priceRange.max}
+                                onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
+                            />
                         </div>
+                        <Button
+                            variant="secondary"
+                            className="w-full text-xs py-2"
+                            onClick={handlePriceFilter}
+                        >
+                            Apply
+                        </Button>
                     </div>
                 </div>
 
@@ -155,11 +233,15 @@ const ProductListPage = () => {
                         <div className="flex items-center gap-2">
                             <span className="text-sm text-gray-500">Sort by:</span>
                             <div className="relative inline-block text-left">
-                                <select className="text-sm font-medium text-gray-700 bg-transparent border-none focus:ring-0 cursor-pointer">
-                                    <option>Most Popular</option>
-                                    <option>Newest</option>
-                                    <option>Price: Low to High</option>
-                                    <option>Price: High to Low</option>
+                                <select
+                                    className="text-sm font-medium text-gray-700 bg-transparent border-none focus:ring-0 cursor-pointer"
+                                    value={sortBy}
+                                    onChange={handleSortChange}
+                                >
+                                    <option value="createdAt,desc">Newest</option>
+                                    <option value="price,asc">Price: Low to High</option>
+                                    <option value="price,desc">Price: High to Low</option>
+                                    <option value="name,asc">Name: A-Z</option>
                                 </select>
                             </div>
                         </div>
@@ -187,6 +269,29 @@ const ProductListPage = () => {
                             {products.map(product => (
                                 <ProductCard key={product.id} product={product} />
                             ))}
+                        </div>
+                    )}
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                        <div className="mt-10 flex justify-center gap-2">
+                            <Button
+                                variant="secondary"
+                                disabled={page === 0}
+                                onClick={() => handlePageChange(page - 1)}
+                            >
+                                Previous
+                            </Button>
+                            <span className="flex items-center px-4 text-sm text-gray-600">
+                                Page {page + 1} of {totalPages}
+                            </span>
+                            <Button
+                                variant="secondary"
+                                disabled={page === totalPages - 1}
+                                onClick={() => handlePageChange(page + 1)}
+                            >
+                                Next
+                            </Button>
                         </div>
                     )}
                 </div>

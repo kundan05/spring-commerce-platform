@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { FaArrowRight, FaTruck, FaShieldAlt, FaUndo } from 'react-icons/fa';
 import Button from '../components/common/Button';
 import ProductCard from '../components/products/ProductCard';
+import HeroSection from '../components/home/HeroSection';
+import CategoryGrid from '../components/home/CategoryGrid';
 import api from '../services/api';
 
 const HomePage = () => {
@@ -31,44 +33,18 @@ const HomePage = () => {
     return (
         <div className="flex flex-col gap-16">
             {/* Hero Section */}
-            <section className="relative bg-primary-900 text-white rounded-3xl overflow-hidden mx-4 mt-4 lg:mx-0">
-                <div className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay" style={{ backgroundImage: "url('/images/hero/cricket-stadium.jpg')" }}></div>
-                <div className="absolute inset-0 bg-gradient-to-r from-primary-950/90 to-primary-900/40"></div>
+            <HeroSection />
 
-                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32 flex flex-col items-start gap-6">
-                    <span className="inline-block px-4 py-1.5 rounded-full bg-primary-500/20 border border-primary-400/30 text-primary-200 text-sm font-medium backdrop-blur-sm">
-                        Season 2026 Gear
-                    </span>
-                    <h1 className="text-4xl md:text-6xl font-bold font-display leading-tight max-w-2xl">
-                        Unleash Your Inner <br />
-                        <span className="text-primary-300">Cricketer</span>
-                    </h1>
-                    <p className="text-lg md:text-xl text-gray-300 max-w-xl leading-relaxed">
-                        Premium cricket equipment for professionals and enthusiasts.
-                        Experience the perfect drive with our hand-picked selection.
-                    </p>
-                    <div className="flex gap-4 mt-4">
-                        <Link to="/products">
-                            <Button size="lg" className="shadow-xl shadow-primary-900/20">
-                                Shop Equipment <FaArrowRight className="ml-2" />
-                            </Button>
-                        </Link>
-                        <Link to="/products?category=apparel">
-                            <Button variant="secondary" size="lg" className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm">
-                                Team Apparel
-                            </Button>
-                        </Link>
-                    </div>
-                </div>
-            </section>
+            {/* Category Grid */}
+            <CategoryGrid />
 
             {/* Features Grid */}
             <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {[
-                        { icon: FaTruck, title: 'Free Shipping', desc: 'On all orders over $500' },
-                        { icon: FaShieldAlt, title: 'Secure Payment', desc: '100% secure payment processing' },
-                        { icon: FaUndo, title: 'Easy Returns', desc: '30-day return policy' },
+                        { icon: FaTruck, title: 'Free Delivery', desc: 'On orders over ₹5,000 — no catches' },
+                        { icon: FaShieldAlt, title: 'Safe Checkout', desc: 'UPI, cards, net banking — all encrypted' },
+                        { icon: FaUndo, title: 'Hassle-free Returns', desc: 'Changed your mind? 30 days, no questions' },
                     ].map((feature, idx) => (
                         <div key={idx} className="flex items-start p-6 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
                             <div className="p-3 rounded-lg bg-primary-50 text-primary-600 mr-4">
@@ -87,8 +63,8 @@ const HomePage = () => {
             <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
                 <div className="flex justify-between items-end mb-8">
                     <div>
-                        <h2 className="text-3xl font-bold text-gray-900 font-display">Featured Products</h2>
-                        <p className="text-gray-500 mt-2">Hand-picked favorites just for you</p>
+                        <h2 className="text-3xl font-bold text-gray-900 font-display">What's Moving Right Now</h2>
+                        <p className="text-gray-500 mt-2">The stuff people are actually buying this week</p>
                     </div>
                     <Link to="/products" className="text-primary-600 font-medium hover:text-primary-700 hover:underline">
                         View All
@@ -122,9 +98,9 @@ const HomePage = () => {
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary-900 rounded-full blur-3xl opacity-50 -translate-x-1/3 translate-y-1/3"></div>
 
                 <div className="relative z-10 max-w-3xl mx-auto text-center">
-                    <h2 className="text-3xl md:text-4xl font-bold font-display mb-4">Join Our Community</h2>
+                    <h2 className="text-3xl md:text-4xl font-bold font-display mb-4">Don't Miss Restocks</h2>
                     <p className="text-gray-300 mb-8 text-lg">
-                        Sign up for our newsletter to receive exclusive offers, design tips, and first access to new collections.
+                        Get notified about new drops and restocks. No spam — we hate it too.
                     </p>
                     <form className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto" onSubmit={e => e.preventDefault()}>
                         <input

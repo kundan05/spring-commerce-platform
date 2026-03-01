@@ -23,8 +23,13 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<ProductResponse>>> getAllProducts(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) java.math.BigDecimal minPrice,
+            @RequestParam(required = false) java.math.BigDecimal maxPrice,
             @PageableDefault(size = 10) Pageable pageable) {
-        Page<ProductResponse> products = productService.getAllProducts(pageable);
+        Page<ProductResponse> products = productService.getAllProducts(search, categoryId, minPrice, maxPrice,
+                pageable);
         return ResponseEntity.ok(new ApiResponse<>(true, "Products fetched successfully", products));
     }
 

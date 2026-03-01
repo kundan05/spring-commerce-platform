@@ -43,7 +43,7 @@ const RegisterPage = () => {
                     </div>
                     <h2 className="text-3xl font-extrabold font-display text-gray-900">Create Account</h2>
                     <p className="mt-2 text-sm text-gray-600">
-                        Join SpringCommerce today
+                        Join CricStore
                     </p>
                 </div>
 
