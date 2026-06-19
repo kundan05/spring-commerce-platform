@@ -1,6 +1,8 @@
 # Spring Commerce Platform
 
 Enterprise-grade full-stack e-commerce platform. Spring Boot 3.2 + React 19 + MySQL.
+<img width="1853" height="1005" alt="image" src="https://github.com/user-attachments/assets/67e501de-e7fc-438b-8145-30a61cbfa04b" />
+
 
 ## Tech Stack
 
@@ -55,66 +57,7 @@ npm run dev
 | POST | `/auth/register` | Register new user | No |
 | POST | `/auth/refresh` | Refresh JWT token | No |
 
-### Products (`/api/v1/products`)
-| Method | Path | Description | Auth |
-|--------|------|-------------|------|
-| GET | `/products` | List products (search, filter, paginate) | No |
-| GET | `/products/{id}` | Product details | No |
-| GET | `/products/search?query=` | Search products | No |
-| POST | `/products` | Create product | ADMIN |
-| PUT | `/products/{id}` | Update product | ADMIN |
-| DELETE | `/products/{id}` | Delete product | ADMIN |
 
-### Cart (`/api/v1/cart`)
-| Method | Path | Description | Auth |
-|--------|------|-------------|------|
-| GET | `/cart` | Get user's cart | USER |
-| POST | `/cart/items` | Add item to cart | USER |
-| PUT | `/cart/items/{id}` | Update quantity | USER |
-| DELETE | `/cart/items/{id}` | Remove item | USER |
-| DELETE | `/cart/clear` | Clear cart | USER |
-
-### Orders (`/api/v1/orders`)
-| Method | Path | Description | Auth |
-|--------|------|-------------|------|
-| POST | `/orders` | Place order | USER |
-| GET | `/orders` | User's order history | USER |
-| GET | `/orders/{id}` | Order details | USER |
-
-### Users (`/api/v1/users`)
-| Method | Path | Description | Auth |
-|--------|------|-------------|------|
-| GET | `/users/me` | Get profile | USER |
-| PUT | `/users/me` | Update profile | USER |
-| PUT | `/users/me/password` | Change password | USER |
-
-### Admin (`/api/v1/admin`)
-| Method | Path | Description | Auth |
-|--------|------|-------------|------|
-| GET | `/admin/stats` | Dashboard stats | ADMIN |
-| GET | `/admin/orders` | All orders | ADMIN |
-| PUT | `/admin/orders/{id}/status` | Update order status | ADMIN |
-
-### Payments (`/api/v1/payments`)
-| Method | Path | Description | Auth |
-|--------|------|-------------|------|
-| POST | `/payments/create-intent` | Create Stripe PaymentIntent | USER |
-| POST | `/payments/confirm` | Confirm payment | USER |
-
-### Webhooks
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/api/v1/webhooks/stripe` | Stripe event webhooks |
-
-## Environment Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `JWT_SECRET` | (required) | Base64-encoded 256-bit secret |
-| `JWT_EXPIRATION_MS` | 900000 (15min) | Access token TTL |
-| `JWT_REFRESH_EXPIRATION_MS` | 604800000 (7d) | Refresh token TTL |
-| `STRIPE_API_KEY` | (required) | Stripe secret key |
-| `DB_ROOT_PASSWORD` | root | MySQL root password |
 
 ## Security
 
