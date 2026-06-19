@@ -1,25 +1,44 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { clearCart, clearLocalCart } from '../store/slices/cartSlice';
 import api from '../services/api';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import { FaLock, FaArrowLeft } from 'react-icons/fa';
 
 const CheckoutPage = () => {
-    const { cartItems, cartTotal, clearCart } = useCart();
+    const dispatch = useDispatch();
+    const { items } = useSelector(state => state.cart);
+    const { isAuthenticated } = useSelector(state => state.auth);
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
+    const cartItems = items || [];
+    const cartTotal = cartItems.reduce((sum, item) => sum + (item.price || 0) * item.quantity, 0);
+
     const onSubmit = async (data) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await api.post('/orders', data);
-            clearCart();
+            const orderPayload = {
+                fullName: data.fullName,
+                phoneNumber: data.phoneNumber,
+                street: data.street,
+                city: data.city,
+                state: data.state,
+                zipCode: data.zipCode,
+                country: data.country,
+            };
+            const response = await api.post('/orders', orderPayload);
+            if (isAuthenticated) {
+                dispatch(clearCart());
+            } else {
+                dispatch(clearLocalCart());
+            }
             const orderId = response.data.data.id;
             navigate(`/payment/${orderId}`);
         } catch (err) {
@@ -128,20 +147,20 @@ const CheckoutPage = () => {
 
                         <div className="space-y-4 mb-6">
                             {cartItems.map(item => (
-                                <div key={item.id} className="flex gap-4 items-start">
+                                <div key={item.id || item.productId} className="flex gap-4 items-start">
                                     <div className="w-16 h-16 bg-white rounded-lg border border-gray-200 overflow-hidden flex-shrink-0">
                                         <img
                                             src={item.imageUrl || 'https://placehold.co/100?text=Product'}
-                                            alt={item.name}
+                                            alt={item.name || item.productName}
                                             className="w-full h-full object-cover"
                                         />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-gray-900 truncate">{item.name}</p>
+                                        <p className="text-sm font-medium text-gray-900 truncate">{item.name || item.productName}</p>
                                         <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                                     </div>
                                     <div className="text-sm font-medium text-gray-900">
-                                        ${(item.price * item.quantity).toFixed(2)}
+                                        ${((item.price || 0) * item.quantity).toFixed(2)}
                                     </div>
                                 </div>
                             ))}

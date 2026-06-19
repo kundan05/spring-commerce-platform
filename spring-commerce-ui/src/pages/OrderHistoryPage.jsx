@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useParams } from 'react-router-dom';
 import api from '../services/api';
 import Button from '../components/common/Button';
 import { FaBox, FaChevronRight, FaCalendarAlt, FaDollarSign } from 'react-icons/fa';
@@ -113,10 +113,12 @@ const OrderHistoryPage = () => {
                             </ul>
 
                             <div className="mt-6 pt-6 border-t border-gray-100 flex justify-end">
-                                {/* Placeholder for detail view link */}
-                                <button className="text-primary-600 hover:text-primary-700 text-sm font-medium flex items-center gap-1">
+                                <Link
+                                    to={`/orders/${order.id}`}
+                                    className="text-primary-600 hover:text-primary-700 text-sm font-medium flex items-center gap-1"
+                                >
                                     View Order Details <FaChevronRight size={12} />
-                                </button>
+                                </Link>
                             </div>
                         </div>
                     </div>

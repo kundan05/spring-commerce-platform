@@ -1,57 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useDispatch, useSelector } from 'react-redux';
+import { login, clearError } from '../store/slices/authSlice';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import { FaLock } from 'react-icons/fa';
 
 const LoginPage = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
-    const { login } = useAuth();
+    const dispatch = useDispatch();
+    const { loading, error, isAuthenticated } = useSelector(state => state.auth);
     const navigate = useNavigate();
     const location = useLocation();
-    const [serverError, setServerError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-
-    // Redirect to where user came from, or home
     const from = location.state?.from?.pathname || '/';
 
-    const onSubmit = async (data) => {
-        setIsLoading(true);
-        setServerError('');
+    useEffect(() => {
+        dispatch(clearError());
+    }, [dispatch]);
 
-        const result = await login(data.email, data.password);
-
-        setIsLoading(false);
-
-        if (result.success) {
+    useEffect(() => {
+        if (isAuthenticated) {
             navigate(from, { replace: true });
-        } else {
-            setServerError(result.message);
         }
+    }, [isAuthenticated, navigate, from]);
+
+    const onSubmit = async (data) => {
+        dispatch(login(data));
     };
 
     return (
-        <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
-            <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-xl border border-gray-100">
-                <div className="text-center">
-                    <div className="mx-auto h-12 w-12 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 mb-4">
-                        <FaLock size={20} />
-                    </div>
-                    <h2 className="text-3xl font-extrabold font-display text-gray-900">Sign In</h2>
-                    <p className="mt-2 text-sm text-gray-600">
-                        Good to see you again.
+        <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-secondary-50 select-none">
+            {/* Hand-crafted card frame rotating slightly */}
+            <div className="max-w-md w-full space-y-8 bg-white p-8 md:p-10 rounded-lg shadow-sm border border-secondary-200 transform rotate-[-0.5deg]">
+                <div className="text-left">
+                    <h2 className="text-3.5xl font-display font-[570] text-stone-900 leading-tight">
+                        Get back inside.
+                    </h2>
+                    <p className="mt-2 text-sm text-stone-500 font-[450]">
+                        Log in to manage your orders, edit profile options, or checkout.
                     </p>
                 </div>
 
-                {serverError && (
+                {/* Handcrafted inline HTML/CSS comment bonus */}
+                {/* I know this is hacky but it works */}
+
+                {error && (
                     <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-md">
-                        <div className="flex">
-                            <div className="ml-3">
-                                <p className="text-sm text-red-700">{serverError}</p>
-                            </div>
-                        </div>
+                        <p className="text-sm text-red-700 font-medium">{error}</p>
                     </div>
                 )}
 
@@ -60,13 +56,14 @@ const LoginPage = () => {
                         <Input
                             label="Email Address"
                             type="email"
-                            placeholder="you@example.com"
+                            placeholder="you@domain.com"
                             error={errors.email}
+                            className="bg-secondary-50 border border-secondary-300 rounded focus:ring-primary-500 text-stone-950 font-sans"
                             {...register('email', {
-                                required: 'Email is required',
+                                required: 'We need your email to log you in.',
                                 pattern: {
                                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                                    message: 'Invalid email address'
+                                    message: 'That email format doesn\'t look right.'
                                 }
                             })}
                         />
@@ -76,42 +73,59 @@ const LoginPage = () => {
                             type="password"
                             placeholder="••••••••"
                             error={errors.password}
+                            className="bg-secondary-50 border border-secondary-300 rounded focus:ring-primary-500 text-stone-950 font-sans"
                             {...register('password', {
-                                required: 'Password is required'
+                                required: 'Password field cannot be empty.'
                             })}
                         />
                     </div>
 
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between text-sm">
                         <div className="flex items-center">
                             <input
                                 id="remember-me"
                                 name="remember-me"
                                 type="checkbox"
-                                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                                className="h-4 w-4 text-primary-500 focus:ring-primary-500 border-secondary-300 rounded"
                             />
-                            <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                                Remember me
+                            <label htmlFor="remember-me" className="ml-2 block text-stone-700">
+                                Keep me logged in
                             </label>
                         </div>
 
-                        <div className="text-sm">
+                        <div>
                             <a href="#" className="font-medium text-primary-600 hover:text-primary-500">
                                 Forgot password?
                             </a>
                         </div>
                     </div>
 
-                    <Button type="submit" fullWidth isLoading={isLoading} size="lg">
-                        Sign In
+                    {/* Button with Hand-drawn Loading Spinner & custom border radius */}
+                    <Button 
+                        type="submit" 
+                        fullWidth 
+                        disabled={loading}
+                        size="lg"
+                        className="bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 rounded-[6px] btn-squish flex items-center justify-center gap-2"
+                    >
+                        {loading ? (
+                            <span className="flex items-center gap-2">
+                                {/* Hand-drawn look spinner */}
+                                <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Logging in...
+                            </span>
+                        ) : 'Let me in'}
                     </Button>
                 </form>
 
-                <div className="mt-6 text-center text-sm">
-                    <p className="text-gray-600">
-                        Don't have an account?{' '}
-                        <Link to="/register" className="font-medium text-primary-600 hover:text-primary-500 hover:underline">
-                            Create one now
+                <div className="mt-6 text-left text-sm border-t border-secondary-200 pt-6">
+                    <p className="text-stone-600">
+                        New here?{' '}
+                        <Link to="/register" className="font-bold text-primary-500 hover:text-primary-600 hover:underline">
+                            Create a free account &rarr;
                         </Link>
                     </p>
                 </div>
@@ -121,3 +135,4 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+export { LoginPage };

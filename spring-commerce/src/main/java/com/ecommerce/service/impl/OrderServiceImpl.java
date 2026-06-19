@@ -5,6 +5,7 @@ import com.ecommerce.dto.response.OrderResponse;
 import com.ecommerce.entity.*;
 import com.ecommerce.enums.OrderStatus;
 import com.ecommerce.exception.BadRequestException;
+import com.ecommerce.exception.InsufficientStockException;
 import com.ecommerce.exception.ResourceNotFoundException;
 import com.ecommerce.repository.AddressRepository;
 import com.ecommerce.repository.CartRepository;
@@ -76,7 +77,7 @@ public class OrderServiceImpl implements OrderService {
 
             // Check Inventory
             if (product.getStockQuantity() < cartItem.getQuantity()) {
-                throw new BadRequestException("Insufficient stock for product: " + product.getName());
+                throw new InsufficientStockException("Insufficient stock for product: " + product.getName());
             }
 
             // Decrement Stock

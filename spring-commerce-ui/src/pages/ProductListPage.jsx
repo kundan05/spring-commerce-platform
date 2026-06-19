@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import ProductCard from '../components/products/ProductCard';
@@ -33,12 +33,11 @@ const ProductListPage = () => {
         });
         setSortBy(searchParams.get('sort') || 'createdAt,desc');
         setPage(parseInt(searchParams.get('page')) || 0);
-
-        fetchProducts();
     }, [searchParams]);
 
-    const fetchProducts = async () => {
+    const fetchProducts = useCallback(async () => {
         setLoading(true);
+        setError(null);
         try {
             const keyword = searchParams.get('keyword');
             const category = searchParams.get('category');
@@ -54,26 +53,13 @@ const ProductListPage = () => {
             };
 
             if (keyword) params.search = keyword;
-            // Note: Backend expects categoryId, but we are using category names in URL.
-            // Ideally we should look up ID or change backend to support name.
-            // For now, if category is selected, filtering might not work perfect without ID.
-            // But let's pass it if backend supported it or just rely on search?
-            // Re-reading backend Spec: filters by categoryId (Long).
-            // Frontend uses string 'cricket equipment'.
-            // Let's Skip category param for now to avoid 500 error if string passed to Long.
-            // We can rely on client side filtering for category OR implement category lookup.
-            // Given time constraints, I will keep client side filtering for category if possible 
-            // OR just not pass it to backend and let client filter?
-            // Actually, backend search is powerful.
-            // Let's try to pass 'search' as keyword.
-
             if (minPrice) params.minPrice = minPrice;
             if (maxPrice) params.maxPrice = maxPrice;
 
             const response = await api.get('/products', { params });
-            const data = response.data.data;
+            const data = response?.data?.data;
 
-            let productList = data.content || [];
+            let productList = data ? (data.content || []) : [];
 
             // Client-side filtering for category (fallback until we have IDs)
             if (category && category !== 'all') {
@@ -81,14 +67,18 @@ const ProductListPage = () => {
             }
 
             setProducts(productList);
-            setTotalPages(data.totalPages);
+            setTotalPages(data?.totalPages || 0);
         } catch (err) {
             console.error("Failed to fetch products", err);
             setError('Failed to load products. Please try again later.');
         } finally {
             setLoading(false);
         }
-    };
+    }, [searchParams]);
+
+    useEffect(() => {
+        fetchProducts();
+    }, [fetchProducts]);
 
     const updateParams = (newParams) => {
         const params = new URLSearchParams(searchParams);

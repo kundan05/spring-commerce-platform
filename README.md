@@ -1,104 +1,141 @@
 # Spring Commerce Platform
 
-A robust, full-stack e-commerce application built with Spring Boot and React. This platform provides a comprehensive solution for managing products, orders, shopping carts, and user authentication.
+Enterprise-grade full-stack e-commerce platform. Spring Boot 3.2 + React 19 + MySQL.
 
-## 🚀 Tech Stack
+## Tech Stack
+
+**Backend:** Java 17, Spring Boot 3.2.2, Spring Security (JWT), Spring Data JPA, Flyway, MySQL 8.0, Stripe, Swagger/OpenAPI
+
+**Frontend:** React 19, Vite, TailwindCSS 4, Redux Toolkit, React Router 7, Axios, React Hook Form
+
+**CI/CD:** GitHub Actions
+
+## Quick Start
+
+### Prerequisites
+- Java 17+, Node 20+, MySQL 8.0+
 
 ### Backend
--   **Language**: Java 17
--   **Framework**: Spring Boot 3.2.2
--   **Database**: MySQL 8.0
--   **ORM**: Spring Data JPA / Hibernate
--   **Security**: Spring Security with JWT Authentication
--   **Build Tool**: Maven
--   **Database Migration**: Flyway
--   **API Documentation**: SpringDoc OpenAPI (Swagger UI)
-
-### Frontend
--   **Framework**: React 19
--   **Build Tool**: Vite
--   **Styling**: TailwindCSS
--   **State/Routing**: React Router DOM, React Hook Form
--   **HTTP Client**: Axios
-
-## 📋 Prerequisites
-
-Ensure you have the following installed on your local machine:
--   **Java JDK 17** or higher
--   **Node.js** (v18 or higher) and **npm**
--   **MySQL Server** (v8.0 or higher)
--   **Git**
-
-## 🛠️ Getting Started
-
-### 1. Database Setup
-
-Create a MySQL database named `ecommerce_db`. You can use the MySQL command line or a GUI tool like Workbench/DBeaver.
-
-```sql
-CREATE DATABASE ecommerce_db;
+```bash
+cd spring-commerce
+# Set env vars (or use defaults - NOT for production)
+export JWT_SECRET=your-base64-encoded-256bit-secret
+export STRIPE_API_KEY=sk_test_...
+# Run
+mvn spring-boot:run
 ```
 
-### 2. Backend Setup (Spring Boot)
+### Frontend
+```bash
+cd spring-commerce-ui
+npm install
+npm run dev
+```
 
-1.  Navigate to the backend directory:
-    ```bash
-    cd spring-commerce
-    ```
+## Architecture
 
-2.  Configure database credentials. Open `src/main/resources/application.properties` and update your MySQL username and password if they differ from the defaults:
-    ```properties
-    spring.datasource.username=root
-    spring.datasource.password=your_password
-    ```
+```
+┌─────────────┐     ┌──────────────┐     ┌─────────┐
+│  React SPA  │────▶│ Spring Boot  │────▶│  MySQL  │
+│  (Vite)     │     │  REST API    │     │         │
+└─────────────┘     └──────────────┘     └─────────┘
+       │                    │
+       │              ┌─────┴──────┐
+       │              │  Stripe    │
+       │              │  Payment   │
+       │              └────────────┘
+```
 
-3.  Build the application:
-    ```bash
-    mvn clean install
-    ```
+## API Endpoints
 
-4.  Run the application:
-    ```bash
-    mvn spring-boot:run
-    ```
+### Authentication (`/api/v1/auth`)
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| POST | `/auth/login` | Login (email + password) | No |
+| POST | `/auth/register` | Register new user | No |
+| POST | `/auth/refresh` | Refresh JWT token | No |
 
-The backend server will start at `http://localhost:8080`.
+### Products (`/api/v1/products`)
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| GET | `/products` | List products (search, filter, paginate) | No |
+| GET | `/products/{id}` | Product details | No |
+| GET | `/products/search?query=` | Search products | No |
+| POST | `/products` | Create product | ADMIN |
+| PUT | `/products/{id}` | Update product | ADMIN |
+| DELETE | `/products/{id}` | Delete product | ADMIN |
 
-### 3. Frontend Setup (React)
+### Cart (`/api/v1/cart`)
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| GET | `/cart` | Get user's cart | USER |
+| POST | `/cart/items` | Add item to cart | USER |
+| PUT | `/cart/items/{id}` | Update quantity | USER |
+| DELETE | `/cart/items/{id}` | Remove item | USER |
+| DELETE | `/cart/clear` | Clear cart | USER |
 
-1.  Navigate to the frontend directory (open a new terminal):
-    ```bash
-    cd spring-commerce-ui
-    ```
+### Orders (`/api/v1/orders`)
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| POST | `/orders` | Place order | USER |
+| GET | `/orders` | User's order history | USER |
+| GET | `/orders/{id}` | Order details | USER |
 
-2.  Install dependencies:
-    ```bash
-    npm install
-    ```
+### Users (`/api/v1/users`)
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| GET | `/users/me` | Get profile | USER |
+| PUT | `/users/me` | Update profile | USER |
+| PUT | `/users/me/password` | Change password | USER |
 
-3.  Start the development server:
-    ```bash
-    npm run dev
-    ```
+### Admin (`/api/v1/admin`)
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| GET | `/admin/stats` | Dashboard stats | ADMIN |
+| GET | `/admin/orders` | All orders | ADMIN |
+| PUT | `/admin/orders/{id}/status` | Update order status | ADMIN |
 
-The frontend application will be accessible at `http://localhost:5173` (or the port shown in your terminal).
+### Payments (`/api/v1/payments`)
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| POST | `/payments/create-intent` | Create Stripe PaymentIntent | USER |
+| POST | `/payments/confirm` | Confirm payment | USER |
 
-## 📚 API Documentation
+### Webhooks
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/v1/webhooks/stripe` | Stripe event webhooks |
 
-Once the backend application is running, you can access the interactive API documentation (Swagger UI) at:
+## Environment Variables
 
-[http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `JWT_SECRET` | (required) | Base64-encoded 256-bit secret |
+| `JWT_EXPIRATION_MS` | 900000 (15min) | Access token TTL |
+| `JWT_REFRESH_EXPIRATION_MS` | 604800000 (7d) | Refresh token TTL |
+| `STRIPE_API_KEY` | (required) | Stripe secret key |
+| `DB_ROOT_PASSWORD` | root | MySQL root password |
 
-## 🔑 Default Configuration
+## Security
 
--   **Server Port**: `8080`
--   **Database URL**: `jdbc:mysql://localhost:3306/ecommerce_db`
--   **JWT Secret**: Configured in `application.properties` key `app.jwt.secret`.
+- JWT access tokens (15min) + refresh tokens (7 days) with rotation
+- BCrypt password hashing
+- CORS whitelist for frontend origins
+- Content Security Policy headers
+- Role-based access (USER / ADMIN) via `@PreAuthorize`
+- Input validation on all DTOs
+- Global exception handler (no stack traces exposed)
 
-## 🤝 Contributing
+## Features
 
-1.  Fork the repository.
-2.  Create your feature branch (`git checkout -b feature/AmazingFeature`).
-3.  Commit your changes (`git commit -m 'Add some AmazingFeature'`).
-4.  Push to the branch (`git push origin feature/AmazingFeature`).
-5.  Open a Pull Request.
+- Product search, filter by category/price, sort
+- Shopping cart (guest localStorage + authenticated server)
+- Order management with status tracking
+- User profile with password change
+- Admin dashboard with sales stats
+- Stripe payment integration
+- Stripe webhook for async payment confirmation
+- Database migrations via Flyway
+- Caching for product queries
+- Lazy-loaded React routes
+- Token refresh with retry queue for concurrent 401s

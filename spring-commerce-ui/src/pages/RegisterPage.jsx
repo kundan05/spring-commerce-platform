@@ -1,37 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useDispatch, useSelector } from 'react-redux';
+import { register as registerUser, clearError, login } from '../store/slices/authSlice';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import { FaUserPlus } from 'react-icons/fa';
 
 const RegisterPage = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
-    const { register: registerUser, login } = useAuth();
+    const dispatch = useDispatch();
+    const { loading, error, isAuthenticated } = useSelector(state => state.auth);
     const navigate = useNavigate();
     const [serverError, setServerError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        dispatch(clearError());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (isAuthenticated) navigate('/');
+    }, [isAuthenticated, navigate]);
 
     const onSubmit = async (data) => {
-        setIsLoading(true);
-        setServerError('');
-
-        // Register
-        const regResult = await registerUser(data);
-
-        if (regResult.success) {
-            // Auto login after registration
-            const loginResult = await login(data.email, data.password);
-            if (loginResult.success) {
-                navigate('/');
-            } else {
-                navigate('/login');
-            }
+        const result = await dispatch(registerUser(data));
+        if (result.meta.requestStatus === 'fulfilled') {
+            dispatch(login({ email: data.email, password: data.password }));
         } else {
-            setServerError(regResult.message);
+            setServerError(result.payload || 'Registration failed');
         }
-        setIsLoading(false);
     };
 
     return (
@@ -102,7 +99,7 @@ const RegisterPage = () => {
                         })}
                     />
 
-                    <Button type="submit" fullWidth isLoading={isLoading} size="lg">
+                    <Button type="submit" fullWidth isLoading={loading} size="lg">
                         Create Account
                     </Button>
                 </form>

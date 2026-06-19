@@ -2,16 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FaShoppingCart, FaArrowLeft, FaStar, FaCheck, FaTruck, FaShieldAlt } from 'react-icons/fa';
 import api from '../services/api';
-import { useCart } from '../context/CartContext';
+import { useDispatch, useSelector } from 'react-redux';
+import { addToCart, addToLocalCart } from '../store/slices/cartSlice';
+import { useToast } from '../context/ToastContext';
 import Button from '../components/common/Button';
 
 const ProductDetailPage = () => {
     const { id } = useParams();
+    const dispatch = useDispatch();
+    const { isAuthenticated } = useSelector(state => state.auth);
+    const { addToast } = useToast() || {};
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const { addToCart } = useCart();
     const [quantity, setQuantity] = useState(1);
+    const [addingToCart, setAddingToCart] = useState(false);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -134,9 +139,24 @@ const ProductDetailPage = () => {
                     <div className="flex flex-col sm:flex-row gap-4 mb-8">
                         <Button
                             size="lg"
-                            disabled={product.stockQuantity <= 0}
-                            onClick={() => {
-                                for (let i = 0; i < quantity; i++) addToCart(product);
+                            disabled={product.stockQuantity <= 0 || addingToCart}
+                            isLoading={addingToCart}
+                            onClick={async () => {
+                                setAddingToCart(true);
+                                try {
+                                    if (isAuthenticated) {
+                                        await dispatch(addToCart({ productId: product.id, quantity })).unwrap();
+                                    } else {
+                                        for (let i = 0; i < quantity; i++) {
+                                            dispatch(addToLocalCart(product));
+                                        }
+                                    }
+                                    if (addToast) addToast(`${product.name} added to cart`, 'success');
+                                } catch (err) {
+                                    if (addToast) addToast(err || 'Failed to add to cart', 'error');
+                                } finally {
+                                    setAddingToCart(false);
+                                }
                             }}
                             className="flex-1 py-4 text-lg"
                         >
@@ -151,6 +171,7 @@ const ProductDetailPage = () => {
                             Buy Now
                         </Button>
                     </div>
+
 
                     {/* Features/Trust */}
                     <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">

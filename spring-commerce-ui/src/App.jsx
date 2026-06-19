@@ -1,39 +1,62 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
 import Layout from './components/layout/Layout';
-import HomePage from './pages/HomePage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import ProductListPage from './pages/ProductListPage';
-import ProductDetailPage from './pages/ProductDetailPage';
-import CartPage from './pages/CartPage';
-import CheckoutPage from './pages/CheckoutPage';
-import PaymentPage from './pages/PaymentPage';
-import OrderHistoryPage from './pages/OrderHistoryPage';
-import AboutPage from './pages/AboutPage';
-import ContactPage from './pages/ContactPage';
-import ShippingPage from './pages/ShippingPage';
+import ProtectedRoute from './components/common/ProtectedRoute';
+import { ToastProvider } from './context/ToastContext';
 import AdminLayout from './components/admin/AdminLayout';
-import AdminDashboardPage from './pages/admin/AdminDashboardPage';
-import AdminOrdersPage from './pages/admin/AdminOrdersPage';
-import AdminProductsPage from './pages/admin/AdminProductsPage';
-import { CartProvider } from './context/CartContext';
+
+const HomePage = lazy(() => import('./pages/HomePage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+const ProductListPage = lazy(() => import('./pages/ProductListPage'));
+const ProductDetailPage = lazy(() => import('./pages/ProductDetailPage'));
+const CartPage = lazy(() => import('./pages/CartPage'));
+const CheckoutPage = lazy(() => import('./pages/CheckoutPage'));
+const PaymentPage = lazy(() => import('./pages/PaymentPage'));
+const OrderHistoryPage = lazy(() => import('./pages/OrderHistoryPage'));
+const OrderDetailPage = lazy(() => import('./pages/OrderDetailPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
+const ContactPage = lazy(() => import('./pages/ContactPage'));
+const ShippingPage = lazy(() => import('./pages/ShippingPage'));
+const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'));
+const AdminOrdersPage = lazy(() => import('./pages/admin/AdminOrdersPage'));
+const AdminProductsPage = lazy(() => import('./pages/admin/AdminProductsPage'));
+
+function Loading() {
+  return (
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600" />
+    </div>
+  );
+}
 
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <CartProvider>
+      <ToastProvider>
+        <Suspense fallback={<Loading />}>
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<HomePage />} />
               <Route path="products" element={<ProductListPage />} />
               <Route path="products/:id" element={<ProductDetailPage />} />
               <Route path="cart" element={<CartPage />} />
-              <Route path="checkout" element={<CheckoutPage />} />
-              <Route path="payment/:orderId" element={<PaymentPage />} />
-              <Route path="order-history" element={<OrderHistoryPage />} />
+              <Route path="checkout" element={
+                <ProtectedRoute><CheckoutPage /></ProtectedRoute>
+              } />
+              <Route path="payment/:orderId" element={
+                <ProtectedRoute><PaymentPage /></ProtectedRoute>
+              } />
+              <Route path="order-history" element={
+                <ProtectedRoute><OrderHistoryPage /></ProtectedRoute>
+              } />
+              <Route path="orders/:id" element={
+                <ProtectedRoute><OrderDetailPage /></ProtectedRoute>
+              } />
+              <Route path="profile" element={
+                <ProtectedRoute><ProfilePage /></ProtectedRoute>
+              } />
               <Route path="login" element={<LoginPage />} />
               <Route path="register" element={<RegisterPage />} />
               <Route path="about" element={<AboutPage />} />
@@ -41,16 +64,18 @@ function App() {
               <Route path="shipping" element={<ShippingPage />} />
             </Route>
 
-            {/* Admin Routes */}
-            <Route path="/admin" element={<AdminLayout />}>
+            <Route path="/admin" element={
+              <ProtectedRoute requireAdmin>
+                <AdminLayout />
+              </ProtectedRoute>
+            }>
               <Route index element={<AdminDashboardPage />} />
               <Route path="orders" element={<AdminOrdersPage />} />
               <Route path="products" element={<AdminProductsPage />} />
-              {/* <Route path="users" element={<AdminUsersPage />} /> */}
             </Route>
           </Routes>
-        </CartProvider>
-      </AuthProvider>
+        </Suspense>
+      </ToastProvider>
     </Router>
   );
 }

@@ -6,6 +6,7 @@ import com.ecommerce.entity.Cart;
 import com.ecommerce.entity.CartItem;
 import com.ecommerce.entity.Product;
 import com.ecommerce.entity.User;
+import com.ecommerce.exception.InsufficientStockException;
 import com.ecommerce.exception.ResourceNotFoundException;
 import com.ecommerce.repository.CartItemRepository;
 import com.ecommerce.repository.CartRepository;
@@ -44,7 +45,7 @@ public class CartServiceImpl implements CartService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
         if (product.getStockQuantity() < itemRequest.getQuantity()) {
-            throw new IllegalArgumentException("Insufficient stock");
+            throw new InsufficientStockException("Insufficient stock for product: " + product.getName());
         }
 
         Optional<CartItem> existingItem = cart.getItems().stream()

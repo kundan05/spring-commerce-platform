@@ -1,6 +1,7 @@
 package com.ecommerce.controller;
 
 import com.ecommerce.dto.request.LoginRequest;
+import com.ecommerce.dto.request.RefreshTokenRequest;
 import com.ecommerce.dto.request.RegisterRequest;
 import com.ecommerce.dto.response.ApiResponse;
 import com.ecommerce.dto.response.JwtResponse;
@@ -31,5 +32,11 @@ public class AuthController {
     public ResponseEntity<ApiResponse<String>> register(@RequestBody @Valid RegisterRequest registerRequest) {
         String response = authService.register(registerRequest);
         return new ResponseEntity<>(new ApiResponse<>(true, response, null), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<JwtResponse>> refresh(@RequestBody @Valid RefreshTokenRequest request) {
+        JwtResponse jwtResponse = authService.refreshToken(request);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Token refreshed successfully", jwtResponse));
     }
 }

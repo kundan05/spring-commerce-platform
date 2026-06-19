@@ -7,11 +7,13 @@ import com.ecommerce.repository.UserRepository;
 import com.ecommerce.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AdminServiceImpl implements AdminService {
 
     private final OrderRepository orderRepository;
@@ -22,7 +24,7 @@ public class AdminServiceImpl implements AdminService {
     public AdminStatsResponse getStats() {
         BigDecimal totalSales = orderRepository.sumTotalAmount();
         if (totalSales == null) totalSales = BigDecimal.ZERO;
-        
+
         long totalOrders = orderRepository.count();
         long totalUsers = userRepository.count();
         long totalProducts = productRepository.count();
